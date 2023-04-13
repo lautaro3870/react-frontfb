@@ -15,6 +15,7 @@ function App() {
         </Routes>
       </BrowserRouter>
 
+    {/* "homepage": "https://lautaro3870.github.io/react-frontfb", */}
       {/* <Table /> */}
     </div>
   );
