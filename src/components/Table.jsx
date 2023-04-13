@@ -7,9 +7,7 @@ export default function Table() {
   const [proyectos, setProyectos] = useState([]);
 
   const url = "https://proyecto-fundacion.herokuapp.com/api/Proyecto";
-  const token =
-    "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIyMSIsIm5iZiI6MTY4MTIwMTU2MiwiZXhwIjoxNjg1NTIxNTYyLCJpYXQiOjE2ODEyMDE1NjJ9.nelLW9XLyoHp7yHvTtNhyxY4O0AoFM5EBzY6HLmggzxzHUF-3Yqe1FawpQFb09_6qnJrGocD3QAffYsYoPjPLw";
-
+  
   const getProyectos = async () => {
     const response = await fetch(url, {
       method: "GET",
