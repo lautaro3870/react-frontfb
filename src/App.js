@@ -9,13 +9,13 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route>
-            <Route path="/" element={<Login />} />
-            <Route path="/super" element={<Table />} />
+            <Route path="/react-frontfb/" element={<Login />} />
+            <Route path="/react-frontfb/super" element={<Table />} />
           </Route>
         </Routes>
       </BrowserRouter>
 
-    {/* "homepage": "https://lautaro3870.github.io/react-frontfb", */}
+    
       {/* <Table /> */}
     </div>
   );
