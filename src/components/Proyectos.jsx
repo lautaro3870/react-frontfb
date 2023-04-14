@@ -2,12 +2,19 @@ import React, { useEffect, useState } from "react";
 import DataTable, { createTheme } from "react-data-table-component";
 import { AiFillPrinter, AiOutlineEdit } from "react-icons/ai";
 import { BiTrash } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import BarraNavegacion from "./BarraNavegacion";
 
 export default function Table() {
   const [proyectos, setProyectos] = useState([]);
+  const navigate = useNavigate();
 
-  const url = "https://proyecto-fundacion.herokuapp.com/api/Proyecto";
-  
+  //const url = "https://proyecto-fundacion.herokuapp.com/api/Proyecto";
+
+  const url = "https://localhost:44313/api/Proyecto";
+
+  const token = localStorage.getItem("token");
   const getProyectos = async () => {
     const response = await fetch(url, {
       method: "GET",
@@ -16,13 +23,36 @@ export default function Table() {
         "Content-Type": "application/json",
       },
     });
-    const data = await response.json();
-    console.log(data);
-    setProyectos(data);
+    if (response.ok === false) {
+      Swal.fire({
+        title: "Sesión Expirada",
+        showConfirmButton: false,
+        timer: 2000,
+        icon: "error",
+      });
+      setTimeout(() => {
+        navigate("/react-frontfb");
+      }, 2000);
+    } else {
+      const data = await response.json();
+      setProyectos(data);
+    }
   };
 
   useEffect(() => {
-    getProyectos();
+    if (token === null) {
+      Swal.fire({
+        title: "Sesión Expirada",
+        showConfirmButton: false,
+        timer: 2000,
+        icon: "error",
+      });
+      setTimeout(() => {
+        navigate("/react-frontfb");
+      }, 2000);
+    } else {
+      getProyectos();
+    }
   }, []);
 
   const columns = [
@@ -93,9 +123,10 @@ export default function Table() {
 
   return (
     <div>
+      <BarraNavegacion />
       <DataTable
         fixedHeader
-        fixedHeaderScrollHeight="500px"
+        fixedHeaderScrollHeight="100%"
         columns={columns}
         theme="dark"
         data={proyectos}

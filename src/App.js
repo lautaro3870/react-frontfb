@@ -1,6 +1,6 @@
 import "./App.css";
 import Login from "./components/Login";
-import Table from "./components/Table";
+import Table from "./components/Proyectos";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
@@ -9,8 +9,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route>
-            <Route path="/react-frontfb/" element={<Login />} />
-            <Route path="/react-frontfb/super" element={<Table />} />
+            <Route path="/react-frontfb" element={<Login />} />
+            <Route path="/react-frontfb/proyectos" element={<Table />} />
           </Route>
         </Routes>
       </BrowserRouter>
