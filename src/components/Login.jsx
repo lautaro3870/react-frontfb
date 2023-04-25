@@ -16,14 +16,25 @@ export default function Login() {
       email: email.current.value,
       password: password.current.value,
     };
-    
-    const response = await fetch("https://proyecto-fundacion.herokuapp.com/api/Usuario/Login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+
+    Swal.fire({
+      title: "Espere",
+      didOpen: () => {
+        Swal.showLoading();
       },
-      body: JSON.stringify(body),
     });
+
+    const response = await fetch(
+      "https://proyecto-fundacion.herokuapp.com/api/Usuario/Login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
     const data = await response.json();
     console.log(data);
     if (data.ok === false) {
@@ -34,6 +45,12 @@ export default function Login() {
         timer: 3000,
       });
     } else {
+      Swal.fire({
+        icon: "success",
+        title: "Ingreso Exitoso",
+        timer: "1000",
+        showConfirmButton: false,
+      });
       localStorage.setItem("token", data.return.token);
       navigate("/react-frontfb/proyectos");
     }

@@ -1,7 +1,10 @@
 import "./App.css";
+import EditProyecto from "./components/EditProyecto";
+import Formulario from "./components/Formulario";
 import Login from "./components/Login";
 import Table from "./components/Proyectos";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 
 function App() {
   return (
@@ -11,6 +14,8 @@ function App() {
           <Route>
             <Route path="/react-frontfb" element={<Login />} />
             <Route path="/react-frontfb/proyectos" element={<Table />} />
+            <Route path="/react-frontfb/proyectos/:id" element={<EditProyecto />} />
+            <Route path="/react-frontfb/formulario" element={<Formulario />} />
           </Route>
         </Routes>
       </BrowserRouter>
