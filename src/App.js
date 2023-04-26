@@ -14,7 +14,7 @@ function App() {
           <Route>
             <Route path="/react-frontfb" element={<Login />} />
             <Route path="/react-frontfb/proyectos" element={<Table />} />
-            <Route path="/react-frontfb/proyectos/:id" element={<EditProyecto />} />
+            <Route path="/react-frontfb/proyectos/:id" element={<Formulario />} />
             <Route path="/react-frontfb/formulario" element={<Formulario />} />
           </Route>
         </Routes>

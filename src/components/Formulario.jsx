@@ -1,4 +1,5 @@
 import { Grid } from "@mui/material";
+import { useParams } from "react-router-dom";
 import {
   FormControl,
   Input,
@@ -10,17 +11,24 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import DataTable, { createTheme } from "react-data-table-component";
 import Select from "./Select";
+import BarraNavegacion from "./BarraNavegacion";
 
 export default function Formulario() {
-  const url = process.env.REACT_APP_BASE_URL_AREAS;
+  const { id } = useParams();
+
+  const urlAreas = process.env.REACT_APP_BASE_URL_AREAS;
+  const url = process.env.REACT_APP_BASE_URL + id;
+
   const token = localStorage.getItem("token");
 
   const [areas, setAreas] = useState([]);
+  const [areasCombo, setAreasCombo] = useState([]);
+  const [proyecto, setProyecto] = useState({});
   const [nuevasAreas, setNuevasAreas] = useState([]);
 
   const formulario = useRef();
 
-  const getAreas = async () => {
+  const getProyecto = async () => {
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -29,10 +37,25 @@ export default function Formulario() {
       },
     });
     const data = await response.json();
-    setAreas(data);
+    console.log(data);
+    setAreas(data[0].listaAreas);
+    setProyecto(data[0]);
+  };
+
+  const getAreas = async () => {
+    const response = await fetch(urlAreas, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    setAreasCombo(data);
   };
 
   useEffect(() => {
+    getProyecto();
     getAreas();
   }, []);
 
@@ -50,60 +73,135 @@ export default function Formulario() {
       area1: area,
     };
 
-    if (nuevasAreas.length === 0) {
-      let aa = [...nuevasAreas, nuevaArea];
-      console.log(aa);
-      setNuevasAreas(aa);
-    } else {
-      for (let i = 0; i < nuevasAreas.length; i++) {
-        const element = nuevasAreas[i];
-        if (element.id === id) {
-          contador++;
-          break;
-        }
+    for (let i = 0; i < areas.length; i++) {
+      const element = areas[i];
+      if (element.id === id) {
+        contador++;
+        break;
       }
+    }
 
-      if (contador === 0) {
-        const a = [...nuevasAreas, nuevaArea];
-        console.log(a);
-        setNuevasAreas(a);
-      }
+    if (contador === 0) {
+      const a = [...areas, nuevaArea];
+      console.log(a);
+      setAreas(a);
     }
   };
 
   const enviar = async () => {
     const { departamento, titulo } = formulario.current;
 
-    const body = {
-      titulo: titulo.value,
-      departamento: departamento.value,
-      areas: nuevasAreas,
-    };
+    // const body = {
+    //   titulo: titulo.value,
+    //   departamento: departamento.value,
+    //   areas: areas,
+    // };
 
-    console.log(body);
+    //setProyecto((p) => [...p, body]);
 
-    const response = await fetch(process.env.REACT_APP_BASE_URL, {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    console.log(data)
+    if (id === undefined) {
+      console.log("Nueva ficha");
+      
+      const body = {
+        titulo: titulo.value,
+        paisRegion: "string",
+        contratante: "string",
+        dirección: "string",
+        montoContrato: "string",
+        nroContrato: "string",
+        mesInicio: 0,
+        anioInicio: 0,
+        mesFinalizacion: 0,
+        anioFinalizacion: 0,
+        consultoresAsoc: "string",
+        descripcion: "string",
+        resultados: "string",
+        fichaLista: true,
+        enCurso: true,
+        departamento: departamento.value,
+        moneda: "string",
+        certconformidad: true,
+        certificadopor: 0,
+        convenio: true,
+        activo: true,
+        link: "string",
+        areas: areas,
+        personal: [],
+        publicaciones: [],
+      };
+
+      const response = await fetch(process.env.REACT_APP_BASE_URL, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      console.log(data);
+    } else {
+      console.log("Update ficha");
+
+      const body = {
+        id: id,
+        titulo: titulo.value,
+        paisRegion: "string",
+        contratante: "string",
+        dirección: "string",
+        montoContrato: "string",
+        nroContrato: "string",
+        mesInicio: 0,
+        anioInicio: 0,
+        mesFinalizacion: 0,
+        anioFinalizacion: 0,
+        consultoresAsoc: "string",
+        descripcion: "string",
+        resultados: "string",
+        fichaLista: true,
+        enCurso: true,
+        departamento: departamento.value,
+        moneda: "string",
+        certconformidad: true,
+        certificadopor: 0,
+        convenio: true,
+        activo: true,
+        link: "string",
+        areas: areas,
+        personal: [],
+        publicaciones: [],
+      };
+
+      const response = await fetch(process.env.REACT_APP_BASE_URL, {
+        method: "PUT",
+        body: JSON.stringify(body),
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      console.log(data);
+    }
   };
 
   return (
     <Container maxWidth="lg">
+      <BarraNavegacion />
       <br />
       <Form ref={formulario}>
         <Grid container spacing={2}>
           <Grid item lg={3} xs={8}>
-            <Form.Control type="text" id="titulo" placeholder="Titulo" />
+            <Form.Control
+              type="text"
+              id="titulo"
+              value={proyecto.titulo}
+              placeholder="Titulo"
+              onChange={(e) => setProyecto(e.target.value)}
+            />
           </Grid>
           <Grid item lg={3} xs={4}>
-            <Form.Select id="departamento">
+            <Form.Select value={proyecto.departamento} id="departamento">
               <option value="ENERGIA">Energia</option>
               <option value="MADE">MADE</option>
               <option value="ASC">ASC</option>
@@ -122,12 +220,12 @@ export default function Formulario() {
             />
           </Grid>
           <Grid item lg={3} xs={8}>
-            <DataTable columns={columns} data={nuevasAreas} />
+            <DataTable columns={columns} data={areas} />
           </Grid>
         </Grid>
         <br />
         <Button className="primary" onClick={enviar}>
-          Enviar
+          {id === undefined ? "Enviar" : "Actualizar"}
         </Button>
       </Form>
     </Container>
