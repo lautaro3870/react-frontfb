@@ -7,10 +7,17 @@ function BarraNavegacion() {
     <>
       <Navbar bg="dark" variant="dark">
         <Container>
-          <Navbar.Brand href="#home">Navbar</Navbar.Brand>
+          <Navbar.Brand href="/react-frontfb/proyectos">Navbar</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="/react-frontfb">Home</Nav.Link>
-            <Nav.Link href="#features">Features</Nav.Link>
+            <Nav.Link
+              onClick={() => {
+                localStorage.setItem("token", "");
+              }}
+              href="/react-frontfb"
+            >
+              Home
+            </Nav.Link>
+            <Nav.Link href="/react-frontfb/formulario">Nuevo</Nav.Link>
             <Nav.Link href="#pricing">Pricing</Nav.Link>
           </Nav>
         </Container>

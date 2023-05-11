@@ -1,18 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DataTable, { createTheme } from "react-data-table-component";
 import { AiFillPrinter, AiOutlineEdit } from "react-icons/ai";
 import { BiTrash } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import BarraNavegacion from "./BarraNavegacion";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Select from "./Select";
+import { DataGrid } from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
+
+import jsonServerProvider from 'ra-data-json-server';
+import { Admin, Resource, ListGuesser } from "react-admin";
+import { List, Datagrid, TextField, EditButton } from "react-admin";
 
 export default function Table() {
   const [proyectos, setProyectos] = useState([]);
+  const [areas, setAreas] = useState([]);
   const navigate = useNavigate();
 
   //const url = "https://proyecto-fundacion.herokuapp.com/api/Proyecto";
 
-  const url = "https://localhost:44313/api/Proyecto";
+  const formularioBusqueda = useRef();
+  const selectAreas = useRef();
+
+  const url = process.env.REACT_APP_BASE_URL;
 
   const token = localStorage.getItem("token");
   const getProyectos = async () => {
@@ -39,7 +52,21 @@ export default function Table() {
     }
   };
 
+  const getAreas = async () => {
+    const response = await fetch(process.env.REACT_APP_BASE_URL_AREAS, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    setAreas(data);
+  };
+
   useEffect(() => {
+    getAreas();
     if (token === null) {
       Swal.fire({
         title: "Sesión Expirada",
@@ -55,32 +82,77 @@ export default function Table() {
     }
   }, []);
 
+  // const columns = [
+  //   {
+  //     name: "Title",
+  //     selector: (row) => row.titulo,
+  //   },
+  //   {
+  //     name: "Year",
+  //     selector: (row) => row.anioInicio,
+  //   },
+  //   {
+  //     name: "Departamento",
+  //     selector: (row) => row.departamentos,
+  //   },
+  //   {
+  //     name: "Areas",
+  //     selector: (row) => row.listaAreas.map((i) => i.area1 + ", "),
+  //   },
+  //   {
+  //     name: "Actions",
+  //     selector: (row) => (
+  //       <div>
+  //         <button className="btn btn-danger">
+  //           <BiTrash />
+  //         </button>
+  //         <br />
+  //         <button
+  //           className="btn btn-primary"
+  //           onClick={() => {
+  //             navigate("/react-frontfb/proyectos/" + row.id);
+  //           }}
+  //         >
+  //           <AiOutlineEdit />
+  //         </button>
+  //         <br />
+  //         <button
+  //           className="btn btn-secondary"
+  //           onClick={() => {
+  //             alert(row.id);
+  //           }}
+  //         >
+  //           <AiFillPrinter />
+  //         </button>
+  //       </div>
+  //     ),
+  //   },
+  // ];
+
   const columns = [
+    { field: "titulo", headerName: "Titulo", width: 500, resizable: true },
+    { field: "anioInicio", headerName: "Year", width: 90 },
+    ,
+    { field: "departamentos", headerName: "Departamento", width: 150 },
+    { field: "listaAreas[0].area1", headerName: "Areas", width: 150 },
     {
-      name: "Title",
-      selector: (row) => row.titulo,
-    },
-    {
-      name: "Year",
-      selector: (row) => row.anioInicio,
-    },
-    {
-      name: "Areas",
-      selector: (row) => row.listaAreas.map((i) => i.area1 + ", "),
-    },
-    {
-      name: "Actions",
-      selector: (row) => (
+      field: (
         <div>
-          <button>
+          <button className="btn btn-danger">
             <BiTrash />
           </button>
           <br />
-          <button>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              navigate("/react-frontfb/proyectos/" + row.id);
+            }}
+          >
             <AiOutlineEdit />
           </button>
           <br />
           <button
+            className="btn btn-secondary"
             onClick={() => {
               alert(row.id);
             }}
@@ -89,7 +161,44 @@ export default function Table() {
           </button>
         </div>
       ),
+      headerName: "Acciones",
+      width: 150,
     },
+
+    // {
+    //   name: "Areas",
+    //   selector: (row) => row.listaAreas.map((i) => i.area1 + ", "),
+    // },
+    // {
+    //   name: "Actions",
+    //   selector: (row) => (
+    // <div>
+    //   <button className="btn btn-danger">
+    //     <BiTrash />
+    //   </button>
+    //   <br />
+    //   <button
+    //     className="btn btn-primary"
+    //     onClick={() => {
+    //       navigate("/react-frontfb/proyectos/" + row.id);
+    //     }}
+    //   >
+    //     <AiOutlineEdit />
+    //   </button>
+    //   <br />
+    //   <button
+    //     className="btn btn-secondary"
+    //     onClick={() => {
+    //       alert(row.id);
+    //     }}
+    //   >
+    //     <AiFillPrinter />
+    //   </button>
+    // </div>
+    //   ),
+    // },
+
+    ,
   ];
 
   const handleSort = (column, sortDirection) =>
@@ -121,9 +230,94 @@ export default function Table() {
     "dark"
   );
 
+  const obtenerIdArea = (id) => {
+    return id;
+  };
+
+  const buscar = async (e) => {
+    e.preventDefault();
+    const { depto, area } = formularioBusqueda.current;
+
+    const response = await fetch(
+      `https://proyecto-fundacion.herokuapp.com/api/proyecto?Area=${area.value}&Departamento=${depto.value}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    setProyectos(data);
+  };
+
+  const handleClick = async () => {
+    const { depto } = formularioBusqueda.current;
+
+    const response = await fetch(
+      process.env.REACT_APP_BASE_URL_AREAS +
+        "/AreasxDepto?depto=" +
+        depto.value,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    setAreas(data);
+  };
+
+  const PostList = () => (
+    <List>
+      <Datagrid>
+        <TextField source="id" />
+        <TextField source="title" />
+        <DateField source="published_at" />
+        <TextField source="category" />
+        <BooleanField source="commentable" />
+      </Datagrid>
+    </List>
+  );
+
   return (
     <div>
       <BarraNavegacion />
+      <br />
+      <Form
+        ref={formularioBusqueda}
+        style={{ width: "100%", display: "flex", justifyContent: "center" }}
+      >
+        <Form.Group className="mb-3">
+          <Form.Select id="depto">
+            <option value="" selected>
+              Departamento
+            </option>
+            <option value="ENERGIA">ENERGÍA</option>
+            <option value="MADE">MADE</option>
+            <option value="ASC">ASC</option>
+          </Form.Select>
+        </Form.Group>
+        <Form.Group className="mb-3">
+          {/* <Select url={process.env.REACT_APP_BASE_URL_AREAS} callback={obtenerIdArea}/> */}
+          <Form.Select id="area">
+            <option value="" selected>
+              Areas
+            </option>
+            {areas.map((i) => (
+              <option value={i.id}>{i.area1}</option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+        <Form.Group>
+          <Button onClick={buscar}>Buscar</Button>
+        </Form.Group>
+      </Form>
       <DataTable
         fixedHeader
         fixedHeaderScrollHeight="100%"
@@ -133,6 +327,34 @@ export default function Table() {
         pagination
         onSort={handleSort}
       />
+      {/* <Box sx={{ height: "80%", width: "100%" }}>
+        <DataGrid
+          columns={columns}
+          rows={proyectos}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 6,
+              },
+            },
+          }}
+        />
+      </Box> */}
+      {/* <List>
+        <Datagrid>
+          <TextField source="id" />
+          <TextField source="title" />
+          <TextField source="body" />
+          <EditButton />
+        </Datagrid>
+      </List> */}
+      {/* <Admin
+        dataProvider={jsonServerProvider(
+          "https://jsonplaceholder.typicode.com"
+        )}
+      >
+        <Resource  list={PostList} />
+      </Admin> */}
     </div>
   );
 }
