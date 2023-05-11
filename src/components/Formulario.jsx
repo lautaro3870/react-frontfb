@@ -91,9 +91,6 @@ export default function Formulario() {
   const enviar = async () => {
     const { departamento, titulo } = formulario.current;
 
-
-    console.log(departamento.value)
-
     if (id === undefined) {
       console.log("Nueva ficha");
       
