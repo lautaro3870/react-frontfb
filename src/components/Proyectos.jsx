@@ -318,7 +318,7 @@ export default function Table() {
           <Button onClick={buscar}>Buscar</Button>
         </Form.Group>
       </Form>
-      {/* <DataTable
+      <DataTable
         fixedHeader
         fixedHeaderScrollHeight="100%"
         columns={columns}
@@ -326,7 +326,7 @@ export default function Table() {
         data={proyectos}
         pagination
         onSort={handleSort}
-      /> */}
+      />
       {/* <Box sx={{ height: "80%", width: "100%" }}>
         <DataGrid
           columns={columns}
